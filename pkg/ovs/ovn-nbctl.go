@@ -164,12 +164,18 @@ func (c Client) SetPortSecurity(portSecurity bool, port, mac, ipStr, vips string
 }
 
 // CreatePort create logical switch port in ovn
-func (c Client) CreatePort(ls, port, ip, mac, pod, namespace string, portSecurity bool, securityGroups string, vips string) error {
+func (c Client) CreatePort(ls, port, ip, mac, pod, namespace string, portSecurity bool, securityGroups string, vips string, promiscuous bool) error {
 	var ovnCommand []string
+
+	var newMac = mac
+	if (promiscuous) {
+		newMac = util.PromiscuousMAC
+	}
+
 	// It's not allowed to create duplicate lsp with same ip, which is used in vm live migration. So skip to set ip address for lsp.
 	ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
-		"lsp-set-addresses", port, mac}
-
+		"lsp-set-addresses", port, newMac}
+		
 	if portSecurity {
 		var addresses []string
 		addresses = append(addresses, mac)
