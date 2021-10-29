@@ -495,8 +495,14 @@ func (c *Controller) handleAddPod(key string) error {
 			}
 
 			securityGroupAnnotation := pod.Annotations[fmt.Sprintf(util.SecurityGroupAnnotationTemplate, podNet.ProviderName)]
+
+			promiscuous := false
+			if pod.Annotations[fmt.Sprintf(util.PromiscuousAnnotationTemplate, podNet.ProviderName)] == "true" {
+				promiscuous = true
+			}
+
 			portName := ovs.PodNameToPortName(name, namespace, podNet.ProviderName)
-			if err := c.ovnClient.CreatePort(subnet.Name, portName, ipStr, subnet.Spec.CIDRBlock, mac, pod.Name, pod.Namespace, portSecurity, securityGroupAnnotation); err != nil {
+			if err := c.ovnClient.CreatePort(subnet.Name, portName, ipStr, subnet.Spec.CIDRBlock, mac, pod.Name, pod.Namespace, portSecurity, securityGroupAnnotation, promiscuous); err != nil {
 				c.recorder.Eventf(pod, v1.EventTypeWarning, "CreateOVNPortFailed", err.Error())
 				return err
 			}
