@@ -1063,6 +1063,10 @@ func (c *Controller) acquireAddress(pod *v1.Pod, podNet *kubeovnNet) (string, st
 		ipPool[i] = strings.TrimSpace(ip)
 	}
 
+	if pod.Annotations[fmt.Sprintf(util.PromiscuousAnnotationTemplate, podNet.ProviderName)] == "true" {
+		macStr = util.PromiscuousMAC
+	}
+
 	if ok, _ := isStatefulSetPod(pod); !ok {
 		for _, staticIP := range ipPool {
 			if c.ipam.IsIPAssignedToPod(staticIP, podNet.Subnet.Name) {

@@ -36,6 +36,7 @@ const (
 	AllocatedAnnotationSuffix       = ".kubernetes.io/allocated"
 	AllocatedAnnotationTemplate     = "%s.kubernetes.io/allocated"
 	MacAddressAnnotationTemplate    = "%s.kubernetes.io/mac_address"
+	PromiscuousAnnotationTemplate   = "%s.kubernetes.io/promiscuous_port"
 	IpAddressAnnotationTemplate     = "%s.kubernetes.io/ip_address"
 	CidrAnnotationTemplate          = "%s.kubernetes.io/cidr"
 	GatewayAnnotationTemplate       = "%s.kubernetes.io/gateway"
@@ -130,4 +131,6 @@ const (
 	MirrorDefaultName       = "m0"
 
 	DenyAllSecurityGroup = "kubeovn_deny_all"
+
+	PromiscuousMAC = "unknown"
 )

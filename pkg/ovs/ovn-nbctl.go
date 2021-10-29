@@ -140,8 +140,14 @@ func (c Client) CreatePort(ls, port, ip, cidr, mac, pod, namespace string, portS
 	var ovnCommand []string
 	if util.CheckProtocol(cidr) == kubeovnv1.ProtocolDual {
 		ips := strings.Split(ip, ",")
-		ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
-			"lsp-set-addresses", port, fmt.Sprintf("%s %s %s", mac, ips[0], ips[1])}
+		if mac == util.PromiscuousMAC {
+			// Don't set any IP here, as we can only have "unknown".
+			ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
+				"lsp-set-addresses", port, mac}
+		} else {
+			ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
+				"lsp-set-addresses", port, fmt.Sprintf("%s %s %s", mac, ips[0], ips[1])}
+		}
 
 		ipAddr := util.GetIpAddrWithMask(ip, cidr)
 		ipAddrs := strings.Split(ipAddr, ",")
@@ -150,8 +156,14 @@ func (c Client) CreatePort(ls, port, ip, cidr, mac, pod, namespace string, portS
 				"--", "lsp-set-port-security", port, fmt.Sprintf("%s %s %s", mac, ipAddrs[0], ipAddrs[1]))
 		}
 	} else {
-		ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
-			"lsp-set-addresses", port, fmt.Sprintf("%s %s", mac, ip)}
+		if mac == util.PromiscuousMAC {
+			// Don't set any IP here, as we can only have "unknown".
+			ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
+				"lsp-set-addresses", port, mac}
+		} else {
+			ovnCommand = []string{MayExist, "lsp-add", ls, port, "--",
+				"lsp-set-addresses", port, fmt.Sprintf("%s %s", mac, ip)}
+		}
 
 		if portSecurity {
 			ovnCommand = append(ovnCommand,
